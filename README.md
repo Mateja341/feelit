@@ -23,7 +23,7 @@ Ultra-luxurious 3D villa & experience rental platform.
    - `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Supabase → Project Settings → API)
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only; used by the Stripe webhook)
    - `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
-3. Run `supabase/schema.sql` in the Supabase SQL editor to create `villas` + `bookings` tables with RLS policies.
+3. Run `supabase/schema.sql` in the Supabase SQL editor to create `villas` + `bookings` tables with RLS policies, then optionally `supabase/seed.sql` to load the six showcase villas.
 4. `npm run dev` → http://localhost:3000
 
 ## Stripe flows
