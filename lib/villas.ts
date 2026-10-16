@@ -34,7 +34,7 @@ export const SEED_VILLAS: Villa[] = [
       "Helipad",
     ],
     model: "estate",
-    image_url: null,
+    image_url: "/villas/seed-1.webp",
     accent: "#d4af37",
   },
   {
@@ -57,7 +57,7 @@ export const SEED_VILLAS: Villa[] = [
       "Cinema room",
     ],
     model: "estate",
-    image_url: null,
+    image_url: "/villas/seed-2.webp",
     accent: "#f59e0b",
   },
   {
@@ -80,7 +80,7 @@ export const SEED_VILLAS: Villa[] = [
       "Sunset dhoni",
     ],
     model: "overwater",
-    image_url: null,
+    image_url: "/villas/seed-3.webp",
     accent: "#38bdf8",
   },
   {
@@ -103,7 +103,7 @@ export const SEED_VILLAS: Villa[] = [
       "Avalanche-view spa",
     ],
     model: "chalet",
-    image_url: null,
+    image_url: "/villas/seed-4.webp",
     accent: "#a78bfa",
   },
   {
@@ -126,7 +126,7 @@ export const SEED_VILLAS: Villa[] = [
       "Ballroom",
     ],
     model: "estate",
-    image_url: null,
+    image_url: "/villas/seed-5.webp",
     accent: "#34d399",
   },
   {
@@ -149,7 +149,7 @@ export const SEED_VILLAS: Villa[] = [
       "Healer on call",
     ],
     model: "overwater",
-    image_url: null,
+    image_url: "/villas/seed-6.webp",
     accent: "#fb7185",
   },
 ];

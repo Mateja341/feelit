@@ -159,14 +159,23 @@ export default function VillaDetail({
                 className="glass group overflow-hidden rounded-3xl transition-transform hover:-translate-y-1"
               >
                 <div
-                  className="flex h-32 items-center justify-center"
+                  className="relative flex h-32 items-center justify-center overflow-hidden"
                   style={{
                     background: `radial-gradient(120% 140% at 20% 0%, ${r.accent}33 0%, #0f172a 65%)`,
                   }}
                 >
-                  <span className="font-display text-4xl italic text-white/10 transition-colors group-hover:text-white/20">
-                    {r.name.slice(0, 1)}
-                  </span>
+                  {r.image_url ? (
+                    <img
+                      src={r.image_url}
+                      alt={r.name}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <span className="font-display text-4xl italic text-white/10 transition-colors group-hover:text-white/20">
+                      {r.name.slice(0, 1)}
+                    </span>
+                  )}
                 </div>
                 <div className="p-4">
                   <div className="text-[10px] uppercase tracking-[0.25em] text-gold">

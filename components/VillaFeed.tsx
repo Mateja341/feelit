@@ -67,18 +67,28 @@ function VillaCard({
       transition={{ type: "spring", stiffness: 260, damping: 28 }}
       className="glass group relative overflow-hidden rounded-3xl p-0 text-left [perspective:1000px] focus-visible:outline-none"
     >
-      {/* placeholder visual header */}
+      {/* visual header */}
       <div
         className="relative h-44 w-full overflow-hidden"
         style={{
           background: `radial-gradient(120% 140% at 20% 0%, ${villa.accent}33 0%, #0f172a 65%)`,
         }}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-5xl italic text-white/10 transition-colors duration-500 group-hover:text-white/20">
-            {villa.name.slice(0, 1)}
-          </span>
-        </div>
+        {villa.image_url ? (
+          <img
+            src={villa.image_url}
+            alt={villa.name}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="font-display text-5xl italic text-white/10 transition-colors duration-500 group-hover:text-white/20">
+              {villa.name.slice(0, 1)}
+            </span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/10 to-transparent" />
         <div className="absolute bottom-3 left-4 rounded-full bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-gold-bright backdrop-blur">
           {villa.location}
         </div>
