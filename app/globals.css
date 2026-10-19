@@ -1,20 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #0f172a;
-  --color-ink-deep: #020617;
-  --color-ink-soft: #1e293b;
-  --color-gold: #d4af37;
-  --color-gold-bright: #fcd34d;
-  --color-gold-dim: #b45309;
-  --color-mist: #94a3b8;
+  --color-ink: #0b0d1b;
+  --color-ink-deep: #07081a;
+  --color-ink-soft: #141632;
+  --color-gold: #a855f7;
+  --color-gold-bright: #c084fc;
+  --color-gold-dim: #6e3aff;
+  --color-mist: #a1a5c4;
+  --color-violet-glow: #6e3aff;
+  --color-violet-deep: #2d1552;
   --font-display: var(--font-playfair);
   --font-sans: var(--font-manrope);
 }
 
 :root {
-  --background: #020617;
-  --foreground: #e2e8f0;
+  --background: #0b0d1b;
+  --foreground: #ffffff;
 }
 
 html {
@@ -29,56 +31,56 @@ body {
 }
 
 ::selection {
-  background: rgba(212, 175, 55, 0.35);
-  color: #fffbeb;
+  background: rgba(168, 85, 247, 0.4);
+  color: #ffffff;
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #07081a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #1a1f3d;
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+  background: #a855f7;
 }
 
 /* ---- glassmorphism ---- */
 .glass {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.07),
     rgba(255, 255, 255, 0.02)
   );
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.18);
 }
 
 .glass-strong {
   background: linear-gradient(
     135deg,
-    rgba(30, 41, 59, 0.85),
-    rgba(15, 23, 42, 0.9)
+    rgba(20, 22, 50, 0.85),
+    rgba(11, 13, 27, 0.92)
   );
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.22);
 }
 
 .gold-text {
-  background: linear-gradient(120deg, #fcd34d 0%, #d4af37 45%, #b45309 100%);
+  background: linear-gradient(120deg, #c084fc 0%, #a855f7 45%, #6e3aff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .gold-border {
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(168, 85, 247, 0.4);
 }
 
 /* thin luxe divider */
@@ -87,7 +89,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(212, 175, 55, 0.5),
+    rgba(168, 85, 247, 0.5),
     transparent
   );
 }
@@ -97,7 +99,7 @@ body {
   position: absolute;
   border-radius: 9999px;
   filter: blur(120px);
-  opacity: 0.25;
+  opacity: 0.3;
   pointer-events: none;
 }
 

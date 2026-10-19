@@ -1,7 +1,12 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Float, Sparkles } from "@react-three/drei";
+import {
+  ContactShadows,
+  Float,
+  OrbitControls,
+  Sparkles,
+} from "@react-three/drei";
 import { useRef } from "react";
 import type { Group } from "three";
 import type { VillaModel } from "@/lib/types";
@@ -233,10 +238,24 @@ function SceneModel({
 export default function VillaCanvas({
   accent,
   model = "estate",
+  interactive = false,
 }: {
   accent: string;
   model?: VillaModel;
+  interactive?: boolean;
 }) {
+  const scene = (
+    <>
+      {interactive ? (
+        <SceneModel accent={accent} model={model} />
+      ) : (
+        <Float speed={1.4} rotationIntensity={0.15} floatIntensity={0.4}>
+          <SceneModel accent={accent} model={model} />
+        </Float>
+      )}
+    </>
+  );
+
   return (
     <Canvas
       shadows
@@ -248,9 +267,16 @@ export default function VillaCanvas({
       <ambientLight intensity={0.35} />
       <directionalLight position={[5, 7, 4]} intensity={1.4} castShadow />
       <pointLight position={[-4, 3, -3]} intensity={12} color={accent} />
-      <Float speed={1.4} rotationIntensity={0.15} floatIntensity={0.4}>
-        <SceneModel accent={accent} model={model} />
-      </Float>
+      {scene}
+      {interactive && (
+        <OrbitControls
+          enablePan={false}
+          minDistance={2.5}
+          maxDistance={9}
+          minPolarAngle={0.15}
+          maxPolarAngle={Math.PI / 2.05}
+        />
+      )}
       <Sparkles
         count={60}
         scale={[7, 4, 7]}

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import UserMenu from "./UserMenu";
+import { HomeIcon, HeartIcon } from "./icons";
 
 export default function Navbar() {
   return (
@@ -15,30 +16,23 @@ export default function Navbar() {
       <nav className="glass mx-auto mt-4 flex max-w-6xl items-center justify-between rounded-2xl px-6 py-3">
         <Link href="/" className="flex items-baseline gap-2">
           <span className="font-display text-2xl tracking-wide gold-text">
-            Feelit
-          </span>
-          <span className="hidden text-[10px] uppercase tracking-[0.3em] text-mist sm:inline">
-            Private Villas
+            Feel it.
           </span>
         </Link>
-        <div className="flex items-center gap-6 text-sm text-slate-300">
+        <div className="flex items-center gap-5 text-mist">
           <Link
-            href="/#villas"
-            className="hidden transition-colors hover:text-gold-bright sm:inline"
-          >
-            Villas
-          </Link>
-          <Link
-            href="/#experiences"
-            className="hidden transition-colors hover:text-gold-bright sm:inline"
-          >
-            Experiences
-          </Link>
-          <Link
-            href="/host"
+            href="/"
+            aria-label="Home"
             className="transition-colors hover:text-gold-bright"
           >
-            Become a Host
+            <HomeIcon className="h-5 w-5" />
+          </Link>
+          <Link
+            href="/search?favorites=1"
+            aria-label="Liked properties"
+            className="transition-colors hover:text-gold-bright"
+          >
+            <HeartIcon className="h-5 w-5" />
           </Link>
           <UserMenu />
         </div>
