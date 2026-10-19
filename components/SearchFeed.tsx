@@ -199,13 +199,15 @@ function GuestsWidget({
 function ListingCard({
   villa,
   liked,
+  expanded,
   onLike,
-  onExpand,
+  onToggleExpand,
 }: {
   villa: Villa;
   liked: boolean;
+  expanded: boolean;
   onLike: () => void;
-  onExpand: () => void;
+  onToggleExpand: () => void;
 }) {
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -221,8 +223,8 @@ function ListingCard({
   return (
     <motion.div
       layout
-      layoutId={`listing-${villa.id}`}
       onMouseMove={(e) => {
+        if (expanded) return;
         const r = e.currentTarget.getBoundingClientRect();
         mx.set((e.clientX - r.left) / r.width - 0.5);
         my.set((e.clientY - r.top) / r.height - 0.5);
@@ -231,163 +233,227 @@ function ListingCard({
         mx.set(0);
         my.set(0);
       }}
-      style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-      whileHover={{ scale: 1.01 }}
+      style={
+        expanded
+          ? { transformStyle: "preserve-3d" }
+          : { rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }
+      }
       transition={{ type: "spring", stiffness: 240, damping: 28 }}
-      className="glass group relative flex cursor-pointer gap-5 rounded-3xl p-4 [perspective:1200px]"
-      onClick={onExpand}
+      className="group relative cursor-pointer [perspective:1400px]"
+      onClick={onToggleExpand}
     >
-      {/* image */}
-      <div className="relative h-40 w-56 shrink-0 overflow-hidden rounded-2xl">
-        {villa.image_url ? (
-          <img
-            src={villa.image_url}
-            alt={villa.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+      {/* extruded underside — the "3D rectangle" body behind the post face */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute -bottom-3 left-3 right-3 top-4 rounded-3xl border border-gold/25 bg-[#0a0c1e] shadow-[0_30px_80px_-20px_rgba(110,58,255,0.5)]"
+            style={{ transform: "translateZ(-60px) rotateX(6deg)" }}
           />
-        ) : (
-          <div
-            className="flex h-full w-full items-center justify-center"
-            style={{
-              background: `radial-gradient(120% 140% at 20% 0%, ${villa.accent}33 0%, #0b0d1b 65%)`,
-            }}
-          >
-            <span className="font-display text-5xl italic text-white/10">
-              {villa.name.slice(0, 1)}
-            </span>
-          </div>
         )}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onLike();
-          }}
-          aria-label="Save to favorites"
-          className={`absolute right-2.5 top-2.5 rounded-full p-2 backdrop-blur transition-all ${
-            liked
-              ? "bg-gold/80 text-ink"
-              : "bg-black/40 text-white/80 hover:text-gold-bright"
-          }`}
-        >
-          <HeartIcon className="h-3.5 w-3.5" />
-        </button>
-      </div>
+      </AnimatePresence>
 
-      {/* info */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h3 className="truncate text-lg font-semibold text-white">
-              {villa.name}
-            </h3>
-            <p className="mt-0.5 truncate text-xs text-mist">
-              {villa.location} · {pseudoDistance(villa.id)} km from center
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <span className="text-lg font-semibold text-gold-bright">
-              {priceFmt.format(villa.price_per_night)}
-            </span>
-            <span className="block text-[10px] uppercase tracking-widest text-mist">
-              / night
-            </span>
-          </div>
-        </div>
-
-        <div className="hairline my-3" />
-
-        <div className="mt-auto flex items-end justify-between">
-          <div className="flex items-center gap-0.5 text-gold-bright">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <StarIcon
-                key={i}
-                className={`h-3.5 w-3.5 ${
-                  i < Math.round(villa.rating) ? "" : "opacity-25"
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-sm font-semibold text-white">
-            {villa.rating.toFixed(2)}{" "}
-            <span className="text-gold-bright">★</span>
-          </span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ---------- expanded 3D view ---------- */
-
-function ExpandedListing({
-  villa,
-  onClose,
-}: {
-  villa: Villa;
-  onClose: () => void;
-}) {
-  return (
-    <motion.div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
       <motion.div
-        className="absolute inset-0 bg-ink-deep/80 backdrop-blur-md"
-        onClick={onClose}
-      />
-      <motion.div
-        layoutId={`listing-${villa.id}`}
-        transition={{ type: "spring", stiffness: 210, damping: 28 }}
-        className="glass-strong relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl"
-        style={{ transformStyle: "preserve-3d" }}
+        layout
+        className={`glass relative overflow-hidden rounded-3xl p-4 ${
+          expanded
+            ? "shadow-[0_0_60px_-12px_rgba(110,58,255,0.6)]"
+            : ""
+        }`}
+        style={
+          expanded
+            ? { transform: "rotateX(5deg) translateZ(20px)", transformStyle: "preserve-3d" }
+            : undefined
+        }
       >
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
-        >
-          <CloseIcon className="h-4 w-4" />
-        </button>
-
-        <div className="relative h-[380px] w-full">
-          <VillaCanvas accent={villa.accent} model={villa.model} interactive />
-          <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.3em] text-mist/70">
-            Drag to orbit · scroll to zoom
-          </p>
-        </div>
-
-        <div className="flex items-end justify-between gap-4 p-6">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gold">
-              {villa.location}
-            </p>
-            <h3 className="font-display mt-1 text-3xl text-white">
-              {villa.name}
-            </h3>
-            <p className="mt-2 line-clamp-2 max-w-md text-sm text-mist">
-              {villa.description}
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <div className="text-xl font-semibold text-gold-bright">
-              {priceFmt.format(villa.price_per_night)}
-              <span className="text-xs text-mist"> /night</span>
-            </div>
-            <div className="mt-1 text-sm text-white">
-              {villa.rating.toFixed(2)}{" "}
-              <span className="text-gold-bright">★</span>
-            </div>
-            <Link
-              href={`/villas/${villa.id}`}
-              className="mt-3 inline-block rounded-xl bg-gold px-5 py-2.5 text-xs font-semibold tracking-widest text-ink transition-all hover:bg-gold-bright hover:shadow-[0_0_28px_-6px_rgba(168,85,247,0.9)]"
+        <AnimatePresence mode="wait" initial={false}>
+          {expanded ? (
+            <motion.div
+              key="expanded"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col"
             >
-              VIEW RESIDENCE →
-            </Link>
-          </div>
-        </div>
+              {/* top face of the extruded block — platform + 3D projection */}
+              <div className="relative h-72 [perspective:900px]">
+                {/* platform top plane */}
+                <div
+                  className="absolute bottom-4 left-1/2 h-44 w-[82%] rounded-full border border-gold/30 bg-gradient-to-b from-ink-soft to-ink-deep"
+                  style={{
+                    transform: "translateX(-50%) rotateX(64deg)",
+                    boxShadow:
+                      "0 0 60px rgba(110,58,255,0.4), inset 0 0 60px rgba(110,58,255,0.15)",
+                  }}
+                />
+                {/* hologram glow under the model */}
+                <div
+                  className="absolute bottom-8 left-1/2 h-24 w-1/2 rounded-full bg-gold/25 blur-3xl"
+                  style={{ transform: "translateX(-50%) rotateX(64deg)" }}
+                />
+                <div className="absolute inset-0 bottom-2">
+                  <VillaCanvas
+                    accent={villa.accent}
+                    model={villa.model}
+                    interactive
+                  />
+                </div>
+                <p className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.3em] text-mist/60">
+                  Drag to orbit · scroll to zoom
+                </p>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleExpand();
+                  }}
+                  className="absolute right-2 top-2 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
+                  aria-label="Collapse"
+                >
+                  <CloseIcon className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* front face info */}
+              <div className="mt-2 flex items-end justify-between gap-4 px-1 pb-1">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-gold">
+                    {villa.location} · {pseudoDistance(villa.id)} km from center
+                  </p>
+                  <h3 className="font-display mt-1 truncate text-2xl text-white">
+                    {villa.name}
+                  </h3>
+                </div>
+                <div className="shrink-0 text-right">
+                  <span className="text-lg font-semibold text-gold-bright">
+                    {priceFmt.format(villa.price_per_night)}
+                  </span>
+                  <span className="block text-[10px] uppercase tracking-widest text-mist">
+                    / night
+                  </span>
+                </div>
+              </div>
+              <div className="hairline my-3" />
+              <div className="flex items-center justify-between px-1 pb-1">
+                <div className="flex items-center gap-0.5 text-gold-bright">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <StarIcon
+                      key={i}
+                      className={`h-3.5 w-3.5 ${
+                        i < Math.round(villa.rating) ? "" : "opacity-25"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-semibold text-white">
+                    {villa.rating.toFixed(2)}{" "}
+                    <span className="text-gold-bright">★</span>
+                  </span>
+                  <Link
+                    href={`/villas/${villa.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="rounded-xl bg-gold px-4 py-2 text-[11px] font-semibold tracking-widest text-ink transition-all hover:bg-gold-bright hover:shadow-[0_0_24px_-4px_rgba(168,85,247,0.9)]"
+                  >
+                    VIEW →
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="collapsed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex gap-5"
+            >
+              {/* image */}
+              <div className="relative h-40 w-56 shrink-0 overflow-hidden rounded-2xl">
+                {villa.image_url ? (
+                  <img
+                    src={villa.image_url}
+                    alt={villa.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div
+                    className="flex h-full w-full items-center justify-center"
+                    style={{
+                      background: `radial-gradient(120% 140% at 20% 0%, ${villa.accent}33 0%, #0b0d1b 65%)`,
+                    }}
+                  >
+                    <span className="font-display text-5xl italic text-white/10">
+                      {villa.name.slice(0, 1)}
+                    </span>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLike();
+                  }}
+                  aria-label="Save to favorites"
+                  className={`absolute right-2.5 top-2.5 rounded-full p-2 backdrop-blur transition-all ${
+                    liked
+                      ? "bg-gold/80 text-ink"
+                      : "bg-black/40 text-white/80 hover:text-gold-bright"
+                  }`}
+                >
+                  <HeartIcon className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {/* info */}
+              <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <h3 className="truncate text-lg font-semibold text-white">
+                      {villa.name}
+                    </h3>
+                    <p className="mt-0.5 truncate text-xs text-mist">
+                      {villa.location} · {pseudoDistance(villa.id)} km from
+                      center
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <span className="text-lg font-semibold text-gold-bright">
+                      {priceFmt.format(villa.price_per_night)}
+                    </span>
+                    <span className="block text-[10px] uppercase tracking-widest text-mist">
+                      / night
+                    </span>
+                  </div>
+                </div>
+
+                <div className="hairline my-3" />
+
+                <div className="mt-auto flex items-end justify-between">
+                  <div className="flex items-center gap-0.5 text-gold-bright">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <StarIcon
+                        key={i}
+                        className={`h-3.5 w-3.5 ${
+                          i < Math.round(villa.rating) ? "" : "opacity-25"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-white">
+                    {villa.rating.toFixed(2)}{" "}
+                    <span className="text-gold-bright">★</span>
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );
@@ -528,7 +594,7 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
     null,
   ]);
   const [guests, setGuests] = useState({ adults: 2, children: 0, rooms: 1 });
-  const [expanded, setExpanded] = useState<Villa | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [filterOpen, setFilterOpen] = useState(false);
   const [maxPrice, setMaxPrice] = useState(25000);
@@ -638,8 +704,11 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
             <ListingCard
               villa={v}
               liked={liked.has(v.id)}
+              expanded={expandedId === v.id}
               onLike={() => toggleLike(v.id)}
-              onExpand={() => setExpanded(v)}
+              onToggleExpand={() =>
+                setExpandedId((cur) => (cur === v.id ? null : v.id))
+              }
             />
           </motion.div>
         ))}
@@ -649,12 +718,6 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
           </p>
         )}
       </div>
-
-      <AnimatePresence>
-        {expanded && (
-          <ExpandedListing villa={expanded} onClose={() => setExpanded(null)} />
-        )}
-      </AnimatePresence>
 
       <FilterPanel
         open={filterOpen}
