@@ -242,17 +242,50 @@ function ListingCard({
       className="group relative cursor-pointer [perspective:1400px]"
       onClick={onToggleExpand}
     >
-      {/* back face of the extruded box — shifted up and to the right */}
+      {/* extruded cube faces — top + right parallelograms + rear face */}
       <AnimatePresence>
         {expanded && (
-          <motion.div
-            initial={{ opacity: 0, x: 0, y: 0 }}
-            animate={{ opacity: 1, x: 26, y: -26 }}
-            exit={{ opacity: 0, x: 0, y: 0 }}
-            transition={{ type: "spring", stiffness: 170, damping: 24 }}
-            aria-hidden
-            className="absolute inset-0 rounded-3xl border border-gold/30 bg-gradient-to-br from-[#22124a] via-[#151738] to-[#0a0c1e] shadow-[0_30px_80px_-20px_rgba(110,58,255,0.45)]"
-          />
+          <>
+            {/* rear face */}
+            <motion.div
+              key="rear"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              aria-hidden
+              className="absolute inset-0 rounded-3xl border border-gold/15 bg-[#0a0c1e]"
+              style={{ transform: "translate(30px, -30px)" }}
+            />
+            {/* top face — parallelogram above the front edge */}
+            <motion.div
+              key="topface"
+              initial={{ scaleY: 0, skewX: -45 }}
+              animate={{ scaleY: 1, skewX: -45 }}
+              exit={{ scaleY: 0, skewX: -45 }}
+              transition={{ type: "spring", stiffness: 200, damping: 26 }}
+              aria-hidden
+              className="absolute inset-x-0 bottom-full h-[30px] border border-gold/35"
+              style={{
+                transformOrigin: "0% 100%",
+                background:
+                  "linear-gradient(90deg, rgba(45,21,82,0.9), rgba(30,18,66,0.85))",
+              }}
+            />
+            {/* right face — parallelogram right of the front edge */}
+            <motion.div
+              key="rightface"
+              initial={{ scaleX: 0, skewY: -45 }}
+              animate={{ scaleX: 1, skewY: -45 }}
+              exit={{ scaleX: 0, skewY: -45 }}
+              transition={{ type: "spring", stiffness: 200, damping: 26 }}
+              aria-hidden
+              className="absolute inset-y-0 left-full w-[30px] border-y border-r border-gold/25"
+              style={{
+                transformOrigin: "0% 0%",
+                background: "linear-gradient(180deg, #141632, #0a0c1e)",
+              }}
+            />
+          </>
         )}
       </AnimatePresence>
 
@@ -273,7 +306,7 @@ function ListingCard({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="relative flex flex-col pt-2"
+              className="relative flex gap-6"
             >
               <button
                 type="button"
@@ -281,54 +314,76 @@ function ListingCard({
                   e.stopPropagation();
                   onToggleExpand();
                 }}
-                className="absolute right-0 top-0 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
+                className="absolute -right-1 -top-1 z-20 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
                 aria-label="Collapse"
               >
                 <CloseIcon className="h-4 w-4" />
               </button>
+              {/* image */}
+              <div className="relative h-64 w-80 shrink-0 overflow-hidden rounded-2xl">
+                {villa.image_url ? (
+                  <img
+                    src={villa.image_url}
+                    alt={villa.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="flex h-full w-full items-center justify-center"
+                    style={{
+                      background: `radial-gradient(120% 140% at 20% 0%, ${villa.accent}33 0%, #0b0d1b 65%)`,
+                    }}
+                  >
+                    <span className="font-display text-5xl italic text-white/10">
+                      {villa.name.slice(0, 1)}
+                    </span>
+                  </div>
+                )}
+              </div>
               {/* front face info */}
-              <div className="flex items-end justify-between gap-4 px-1 pb-1">
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-gold">
-                    {villa.location} · {pseudoDistance(villa.id)} km from center
-                  </p>
-                  <h3 className="font-display mt-1 truncate text-2xl text-white">
+              <div className="flex min-w-0 flex-1 flex-col py-1">
+                <div className="pr-10">
+                  <h3 className="font-display truncate text-3xl text-white">
                     {villa.name}
                   </h3>
-                </div>
-                <div className="shrink-0 text-right">
-                  <span className="text-lg font-semibold text-gold-bright">
+                  <p className="mt-1 text-[11px] uppercase tracking-[0.3em] text-gold">
+                    {villa.location} · {pseudoDistance(villa.id)} km from center
+                  </p>
+                  <p className="mt-3 text-xl font-semibold text-gold-bright">
                     {priceFmt.format(villa.price_per_night)}
-                  </span>
-                  <span className="block text-[10px] uppercase tracking-widest text-mist">
-                    / night
-                  </span>
+                    <span className="ml-1 text-[10px] uppercase tracking-widest text-mist">
+                      / night
+                    </span>
+                  </p>
                 </div>
-              </div>
-              <div className="hairline my-3" />
-              <div className="flex items-center justify-between px-1 pb-1">
-                <div className="flex items-center gap-0.5 text-gold-bright">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={`h-3.5 w-3.5 ${
-                        i < Math.round(villa.rating) ? "" : "opacity-25"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-semibold text-white">
-                    {villa.rating.toFixed(2)}{" "}
-                    <span className="text-gold-bright">★</span>
-                  </span>
-                  <Link
-                    href={`/villas/${villa.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="rounded-xl bg-gold px-4 py-2 text-[11px] font-semibold tracking-widest text-ink transition-all hover:bg-gold-bright hover:shadow-[0_0_24px_-4px_rgba(168,85,247,0.9)]"
-                  >
-                    VIEW →
-                  </Link>
+                <div className="mt-auto">
+                  <div className="hairline my-4" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-0.5 text-gold-bright">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <StarIcon
+                          key={i}
+                          className={`h-4 w-4 ${
+                            i < Math.round(villa.rating) ? "" : "opacity-25"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-semibold text-white">
+                        {villa.rating.toFixed(2)}{" "}
+                        <span className="text-gold-bright">★</span>
+                      </span>
+                      <Link
+                        href={`/villas/${villa.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="rounded-xl bg-gold px-4 py-2 text-[11px] font-semibold tracking-widest text-ink transition-all hover:bg-gold-bright hover:shadow-[0_0_24px_-4px_rgba(168,85,247,0.9)]"
+                      >
+                        VIEW →
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
