@@ -242,110 +242,52 @@ function ListingCard({
       className="group relative cursor-pointer [perspective:1400px]"
       onClick={onToggleExpand}
     >
-      {/* mini 3D property standing on top of the extruded post */}
+      {/* back face of the extruded box — shifted up and to the right */}
       <AnimatePresence>
         {expanded && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 232 }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ type: "spring", stiffness: 170, damping: 26 }}
-            className="relative z-10 -mb-8"
-          >
-            <VillaCanvas
-              accent={villa.accent}
-              model={villa.model}
-              interactive
-            />
-            <p className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-[0.3em] text-mist/60">
-              Drag to orbit · scroll to zoom
-            </p>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleExpand();
-              }}
-              className="absolute right-0 top-0 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
-              aria-label="Collapse"
-            >
-              <CloseIcon className="h-4 w-4" />
-            </button>
-          </motion.div>
+            initial={{ opacity: 0, x: 0, y: 0 }}
+            animate={{ opacity: 1, x: 26, y: -26 }}
+            exit={{ opacity: 0, x: 0, y: 0 }}
+            transition={{ type: "spring", stiffness: 170, damping: 24 }}
+            aria-hidden
+            className="absolute inset-0 rounded-3xl border border-gold/30 bg-gradient-to-br from-[#22124a] via-[#151738] to-[#0a0c1e] shadow-[0_30px_80px_-20px_rgba(110,58,255,0.45)]"
+          />
         )}
       </AnimatePresence>
 
-      {/* the post extruded into a 3D box */}
-      <div className="relative [perspective:1600px]">
-        <motion.div
-          animate={
-            expanded
-              ? { rotateX: 14, rotateY: 12 }
-              : { rotateX: 0, rotateY: 0 }
-          }
-          transition={{ type: "spring", stiffness: 140, damping: 22 }}
-          style={{ transformStyle: "preserve-3d" }}
-          className="relative"
-        >
-          {expanded && (
-            <>
-              {/* top face — the platform the model stands on */}
-              <div
-                className="absolute inset-x-2 top-0 h-28 rounded-t-3xl border border-gold/30"
-                style={{
-                  transformOrigin: "50% 0%",
-                  transform: "rotateX(-90deg)",
-                  background:
-                    "linear-gradient(180deg, rgba(45,21,82,0.95), rgba(11,13,27,0.98))",
-                  boxShadow: "inset 0 0 60px rgba(110,58,255,0.25)",
+      {/* front face */}
+      <motion.div
+        layout
+        className={`glass relative overflow-hidden rounded-3xl p-4 ${
+          expanded
+            ? "z-10 shadow-[0_30px_80px_-20px_rgba(110,58,255,0.55)]"
+            : ""
+        }`}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          {expanded ? (
+            <motion.div
+              key="expanded"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="relative flex flex-col pt-2"
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleExpand();
                 }}
-              />
-              {/* left side face */}
-              <div
-                className="absolute inset-y-2 left-0 w-28 rounded-l-3xl border-y border-l border-gold/20"
-                style={{
-                  transformOrigin: "0% 50%",
-                  transform: "rotateY(90deg)",
-                  background: "linear-gradient(180deg, #141632, #0a0c1e)",
-                }}
-              />
-              {/* bottom side face */}
-              <div
-                className="absolute inset-x-2 bottom-0 h-28 rounded-b-3xl border-x border-b border-gold/15"
-                style={{
-                  transformOrigin: "50% 100%",
-                  transform: "rotateX(90deg)",
-                  background: "#07081a",
-                }}
-              />
-              {/* back plane sealing the block */}
-              <div
-                className="absolute inset-0 rounded-3xl bg-[#0a0c1e]"
-                style={{ transform: "translateZ(-112px)" }}
-              />
-            </>
-          )}
-
-          <motion.div
-            layout
-            className={`glass relative overflow-hidden rounded-3xl p-4 ${
-              expanded
-                ? "shadow-[0_30px_80px_-20px_rgba(110,58,255,0.55)]"
-                : ""
-            }`}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {expanded ? (
-                <motion.div
-                  key="expanded"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="flex flex-col pt-8"
-                >
-                  {/* front face info */}
-                  <div className="flex items-end justify-between gap-4 px-1 pb-1">
+                className="absolute right-0 top-0 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
+                aria-label="Collapse"
+              >
+                <CloseIcon className="h-4 w-4" />
+              </button>
+              {/* front face info */}
+              <div className="flex items-end justify-between gap-4 px-1 pb-1">
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-gold">
                     {villa.location} · {pseudoDistance(villa.id)} km from center
@@ -480,10 +422,8 @@ function ListingCard({
               </div>
             </motion.div>
           )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
-      </div>
+        </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 }
