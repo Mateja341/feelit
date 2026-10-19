@@ -49,7 +49,7 @@ export default function CustomerSignup({ onBack }: { onBack: () => void }) {
     setError(null);
     const supabase = createSupabaseBrowserClient();
     if (supabase) {
-      const { error: err } = await supabase.auth.signUp({
+      const { data, error: err } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
         options: {
@@ -63,6 +63,10 @@ export default function CustomerSignup({ onBack }: { onBack: () => void }) {
       if (err) {
         setError(err.message);
         setLoading(false);
+        return;
+      }
+      if (data.session) {
+        router.push("/search");
         return;
       }
     }
