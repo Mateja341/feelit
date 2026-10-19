@@ -247,6 +247,14 @@ export default function CustomerSignup({ onBack }: { onBack: () => void }) {
           Log in
         </Link>
       </p>
+
+      <button
+        type="button"
+        onClick={() => router.push("/search")}
+        className="glass mt-5 w-full rounded-xl py-3 text-xs font-semibold tracking-[0.25em] text-mist transition-all hover:border-gold/60 hover:text-white hover:shadow-[0_0_30px_-8px_rgba(168,85,247,0.7)]"
+      >
+        CONTINUE AS GUEST →
+      </button>
     </motion.form>
   );
 }
