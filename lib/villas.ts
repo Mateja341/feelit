@@ -2,12 +2,12 @@ import type { Experience, Villa, VillaModel } from "./types";
 import { createServerSupabaseClient } from "./supabase/server";
 
 export const VILLA_ACCENTS = [
-  "#d4af37",
-  "#f59e0b",
-  "#38bdf8",
+  "#a855f7",
+  "#c084fc",
+  "#8b5cf6",
+  "#6e3aff",
+  "#7c3aed",
   "#a78bfa",
-  "#34d399",
-  "#fb7185",
 ] as const;
 
 const VALID_MODELS: VillaModel[] = ["estate", "overwater", "chalet"];
@@ -35,7 +35,7 @@ export const SEED_VILLAS: Villa[] = [
     ],
     model: "estate",
     image_url: "/villas/seed-1.webp",
-    accent: "#d4af37",
+    accent: "#a855f7",
   },
   {
     id: "seed-2",
@@ -58,7 +58,7 @@ export const SEED_VILLAS: Villa[] = [
     ],
     model: "estate",
     image_url: "/villas/seed-2.webp",
-    accent: "#f59e0b",
+    accent: "#c084fc",
   },
   {
     id: "seed-3",
@@ -81,7 +81,7 @@ export const SEED_VILLAS: Villa[] = [
     ],
     model: "overwater",
     image_url: "/villas/seed-3.webp",
-    accent: "#38bdf8",
+    accent: "#8b5cf6",
   },
   {
     id: "seed-4",
@@ -104,7 +104,7 @@ export const SEED_VILLAS: Villa[] = [
     ],
     model: "chalet",
     image_url: "/villas/seed-4.webp",
-    accent: "#a78bfa",
+    accent: "#6e3aff",
   },
   {
     id: "seed-5",
@@ -127,7 +127,7 @@ export const SEED_VILLAS: Villa[] = [
     ],
     model: "estate",
     image_url: "/villas/seed-5.webp",
-    accent: "#34d399",
+    accent: "#7c3aed",
   },
   {
     id: "seed-6",
@@ -150,7 +150,7 @@ export const SEED_VILLAS: Villa[] = [
     ],
     model: "overwater",
     image_url: "/villas/seed-6.webp",
-    accent: "#fb7185",
+    accent: "#a78bfa",
   },
 ];
 
@@ -163,7 +163,7 @@ export const EXPERIENCES: Experience[] = [
     price: 2400,
     blurb:
       "A two-Michelin-star chef composes a nine-course tasting in your residence, paired by our resident sommelier.",
-    accent: "#d4af37",
+    accent: "#a855f7",
   },
   {
     id: "exp-2",
@@ -173,7 +173,7 @@ export const EXPERIENCES: Experience[] = [
     price: 6800,
     blurb:
       "A crewed 30m sailing yacht, chef-prepared lunch at anchor, and swim stops in water too blue to photograph honestly.",
-    accent: "#38bdf8",
+    accent: "#8b5cf6",
   },
   {
     id: "exp-3",
@@ -183,7 +183,7 @@ export const EXPERIENCES: Experience[] = [
     price: 9400,
     blurb:
       "Helicopter lifts to a private glacier picnic, a mountain-guide ski descent, and lunch at a refuge closed to the public.",
-    accent: "#a78bfa",
+    accent: "#6e3aff",
   },
   {
     id: "exp-4",
@@ -193,7 +193,7 @@ export const EXPERIENCES: Experience[] = [
     price: 5200,
     blurb:
       "Harvest alongside the winemaker, blend your own cuvée to take home, and dine in the château's candlelit cellars.",
-    accent: "#34d399",
+    accent: "#7c3aed",
   },
 ];
 
