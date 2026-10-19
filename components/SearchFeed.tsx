@@ -242,83 +242,110 @@ function ListingCard({
       className="group relative cursor-pointer [perspective:1400px]"
       onClick={onToggleExpand}
     >
-      {/* extruded underside — the "3D rectangle" body behind the post face */}
+      {/* mini 3D property standing on top of the extruded post */}
       <AnimatePresence>
         {expanded && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute -bottom-3 left-3 right-3 top-4 rounded-3xl border border-gold/25 bg-[#0a0c1e] shadow-[0_30px_80px_-20px_rgba(110,58,255,0.5)]"
-            style={{ transform: "translateZ(-60px) rotateX(6deg)" }}
-          />
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 232 }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ type: "spring", stiffness: 170, damping: 26 }}
+            className="relative z-10 -mb-8"
+          >
+            <VillaCanvas
+              accent={villa.accent}
+              model={villa.model}
+              interactive
+            />
+            <p className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-[0.3em] text-mist/60">
+              Drag to orbit · scroll to zoom
+            </p>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpand();
+              }}
+              className="absolute right-0 top-0 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
+              aria-label="Collapse"
+            >
+              <CloseIcon className="h-4 w-4" />
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      <motion.div
-        layout
-        className={`glass relative overflow-hidden rounded-3xl p-4 ${
-          expanded
-            ? "shadow-[0_0_60px_-12px_rgba(110,58,255,0.6)]"
-            : ""
-        }`}
-        style={
-          expanded
-            ? { transform: "rotateX(5deg) translateZ(20px)", transformStyle: "preserve-3d" }
-            : undefined
-        }
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          {expanded ? (
-            <motion.div
-              key="expanded"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col"
-            >
-              {/* top face of the extruded block — platform + 3D projection */}
-              <div className="relative h-72 [perspective:900px]">
-                {/* platform top plane */}
-                <div
-                  className="absolute bottom-4 left-1/2 h-44 w-[82%] rounded-full border border-gold/30 bg-gradient-to-b from-ink-soft to-ink-deep"
-                  style={{
-                    transform: "translateX(-50%) rotateX(64deg)",
-                    boxShadow:
-                      "0 0 60px rgba(110,58,255,0.4), inset 0 0 60px rgba(110,58,255,0.15)",
-                  }}
-                />
-                {/* hologram glow under the model */}
-                <div
-                  className="absolute bottom-8 left-1/2 h-24 w-1/2 rounded-full bg-gold/25 blur-3xl"
-                  style={{ transform: "translateX(-50%) rotateX(64deg)" }}
-                />
-                <div className="absolute inset-0 bottom-2">
-                  <VillaCanvas
-                    accent={villa.accent}
-                    model={villa.model}
-                    interactive
-                  />
-                </div>
-                <p className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.3em] text-mist/60">
-                  Drag to orbit · scroll to zoom
-                </p>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleExpand();
-                  }}
-                  className="absolute right-2 top-2 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition-colors hover:text-gold-bright"
-                  aria-label="Collapse"
-                >
-                  <CloseIcon className="h-4 w-4" />
-                </button>
-              </div>
+      {/* the post extruded into a 3D box */}
+      <div className="relative [perspective:1600px]">
+        <motion.div
+          animate={
+            expanded
+              ? { rotateX: 14, rotateY: -12 }
+              : { rotateX: 0, rotateY: 0 }
+          }
+          transition={{ type: "spring", stiffness: 140, damping: 22 }}
+          style={{ transformStyle: "preserve-3d" }}
+          className="relative"
+        >
+          {expanded && (
+            <>
+              {/* top face — the platform the model stands on */}
+              <div
+                className="absolute inset-x-2 top-0 h-28 rounded-t-3xl border border-gold/30"
+                style={{
+                  transformOrigin: "50% 0%",
+                  transform: "rotateX(90deg)",
+                  background:
+                    "linear-gradient(180deg, rgba(45,21,82,0.95), rgba(11,13,27,0.98))",
+                  boxShadow: "inset 0 0 60px rgba(110,58,255,0.25)",
+                }}
+              />
+              {/* right side face */}
+              <div
+                className="absolute inset-y-2 right-0 w-28 rounded-r-3xl border-y border-r border-gold/20"
+                style={{
+                  transformOrigin: "100% 50%",
+                  transform: "rotateY(90deg)",
+                  background: "linear-gradient(180deg, #141632, #0a0c1e)",
+                }}
+              />
+              {/* bottom side face */}
+              <div
+                className="absolute inset-x-2 bottom-0 h-28 rounded-b-3xl border-x border-b border-gold/15"
+                style={{
+                  transformOrigin: "50% 100%",
+                  transform: "rotateX(-90deg)",
+                  background: "#07081a",
+                }}
+              />
+              {/* back plane sealing the block */}
+              <div
+                className="absolute inset-0 rounded-3xl bg-[#0a0c1e]"
+                style={{ transform: "translateZ(-112px)" }}
+              />
+            </>
+          )}
 
-              {/* front face info */}
-              <div className="mt-2 flex items-end justify-between gap-4 px-1 pb-1">
+          <motion.div
+            layout
+            className={`glass relative overflow-hidden rounded-3xl p-4 ${
+              expanded
+                ? "shadow-[0_30px_80px_-20px_rgba(110,58,255,0.55)]"
+                : ""
+            }`}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {expanded ? (
+                <motion.div
+                  key="expanded"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="flex flex-col pt-8"
+                >
+                  {/* front face info */}
+                  <div className="flex items-end justify-between gap-4 px-1 pb-1">
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-gold">
                     {villa.location} · {pseudoDistance(villa.id)} km from center
@@ -453,8 +480,10 @@ function ListingCard({
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
-      </motion.div>
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
