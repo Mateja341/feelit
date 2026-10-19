@@ -280,7 +280,7 @@ function ListingCard({
         <motion.div
           animate={
             expanded
-              ? { rotateX: 14, rotateY: -12 }
+              ? { rotateX: 14, rotateY: 12 }
               : { rotateX: 0, rotateY: 0 }
           }
           transition={{ type: "spring", stiffness: 140, damping: 22 }}
@@ -294,17 +294,17 @@ function ListingCard({
                 className="absolute inset-x-2 top-0 h-28 rounded-t-3xl border border-gold/30"
                 style={{
                   transformOrigin: "50% 0%",
-                  transform: "rotateX(90deg)",
+                  transform: "rotateX(-90deg)",
                   background:
                     "linear-gradient(180deg, rgba(45,21,82,0.95), rgba(11,13,27,0.98))",
                   boxShadow: "inset 0 0 60px rgba(110,58,255,0.25)",
                 }}
               />
-              {/* right side face */}
+              {/* left side face */}
               <div
-                className="absolute inset-y-2 right-0 w-28 rounded-r-3xl border-y border-r border-gold/20"
+                className="absolute inset-y-2 left-0 w-28 rounded-l-3xl border-y border-l border-gold/20"
                 style={{
-                  transformOrigin: "100% 50%",
+                  transformOrigin: "0% 50%",
                   transform: "rotateY(90deg)",
                   background: "linear-gradient(180deg, #141632, #0a0c1e)",
                 }}
@@ -314,7 +314,7 @@ function ListingCard({
                 className="absolute inset-x-2 bottom-0 h-28 rounded-b-3xl border-x border-b border-gold/15"
                 style={{
                   transformOrigin: "50% 100%",
-                  transform: "rotateX(-90deg)",
+                  transform: "rotateX(90deg)",
                   background: "#07081a",
                 }}
               />
