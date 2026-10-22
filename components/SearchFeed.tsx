@@ -196,6 +196,10 @@ function GuestsWidget({
 
 /* ---------- listing card ---------- */
 
+// vertical space opened above an expanded card — later occupied by the
+// rotating 3D model standing on the card's top face
+const EXPAND_CLEARANCE = 150;
+
 function ListingCard({
   villa,
   liked,
@@ -624,6 +628,18 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
   const [amenities, setAmenities] = useState<string[]>([]);
   const [only3d, setOnly3d] = useState(false);
 
+  const toggleExpand = (id: string) => {
+    const next = expandedId === id ? null : id;
+    setExpandedId(next);
+    // scroll so content above the card slides up instead of the card
+    // moving down — only on fresh expand / collapse, not card switches
+    if (next && !expandedId) {
+      window.scrollBy({ top: EXPAND_CLEARANCE, behavior: "smooth" });
+    } else if (!next) {
+      window.scrollBy({ top: -EXPAND_CLEARANCE, behavior: "smooth" });
+    }
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = villas.filter(
@@ -722,7 +738,11 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
             key={v.id}
             layout
             initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              marginTop: expandedId === v.id ? EXPAND_CLEARANCE : 0,
+            }}
             transition={{ duration: 0.5, delay: i * 0.06 }}
           >
             <ListingCard
@@ -730,9 +750,7 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
               liked={liked.has(v.id)}
               expanded={expandedId === v.id}
               onLike={() => toggleLike(v.id)}
-              onToggleExpand={() =>
-                setExpandedId((cur) => (cur === v.id ? null : v.id))
-              }
+              onToggleExpand={() => toggleExpand(v.id)}
             />
           </motion.div>
         ))}
