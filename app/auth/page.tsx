@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import AuthForm from "@/components/AuthForm";
 
@@ -19,7 +20,9 @@ export default function AuthPage() {
             Enter <span className="gold-text italic">Feelit</span>
           </h1>
         </div>
-        <AuthForm />
+        <Suspense>
+          <AuthForm />
+        </Suspense>
       </section>
     </main>
   );

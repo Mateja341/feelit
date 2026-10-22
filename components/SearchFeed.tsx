@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
@@ -672,13 +672,46 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
     }
   }, [villas, query, sort, maxPrice, amenities, guests]);
 
-  const toggleLike = (id: string) =>
+  // Load persisted favorites once (logged-in users)
+  useEffect(() => {
+    fetch("/api/favorites")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.ids?.length && setLiked(new Set(d.ids)))
+      .catch(() => {});
+  }, []);
+
+  const toggleLike = async (id: string) => {
+    // Seed villas have no DB row — keep the heart purely local.
+    if (id.startsWith("seed-")) {
+      setLiked((s) => {
+        const n = new Set(s);
+        n.has(id) ? n.delete(id) : n.add(id);
+        return n;
+      });
+      return;
+    }
     setLiked((s) => {
       const n = new Set(s);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
+      n.has(id) ? n.delete(id) : n.add(id);
       return n;
     });
+    const res = await fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ property_id: id }),
+    });
+    if (res.status === 401) {
+      window.location.href = "/auth?next=/search";
+      return;
+    }
+    if (!res.ok) {
+      setLiked((s) => {
+        const n = new Set(s);
+        n.has(id) ? n.delete(id) : n.add(id);
+        return n;
+      });
+    }
+  };
 
   const toggleAmenity = (a: string) =>
     setAmenities((s) => (s.includes(a) ? s.filter((x) => x !== a) : [...s, a]));

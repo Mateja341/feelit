@@ -225,18 +225,53 @@ function mapRow(row: Record<string, unknown>, i: number): Villa {
  * Reads villas from Supabase when configured; otherwise returns the seed
  * collection so the feed always renders.
  */
+function mapProperty(row: Record<string, unknown>, i: number): Villa {
+  const photos = (row.property_photos ?? []) as { url: string; is_cover: boolean }[];
+  const rawModel = String(row.model ?? "estate");
+  return {
+    id: String(row.id),
+    name: String(row.title),
+    location: [row.city, row.country].filter(Boolean).join(", "),
+    description: String(row.description ?? ""),
+    price_per_night: Number(row.nightly_price ?? 0),
+    bedrooms: Number(row.bedrooms ?? 0),
+    bathrooms: Number(row.bathrooms ?? 0),
+    guests: Number(row.max_guests ?? 2),
+    rating: Number(row.rating ?? 5.0),
+    amenities: Array.isArray(row.amenities) ? (row.amenities as string[]) : [],
+    model: VALID_MODELS.includes(rawModel as VillaModel)
+      ? (rawModel as VillaModel)
+      : "estate",
+    image_url:
+      photos.find((p) => p.is_cover)?.url ?? photos[0]?.url ?? null,
+    accent: String(row.accent ?? VILLA_ACCENTS[i % VILLA_ACCENTS.length]),
+    created_at: row.created_at as string | undefined,
+  };
+}
+
 export async function getVillas(): Promise<Villa[]> {
   const supabase = createServerSupabaseClient();
   if (!supabase) return SEED_VILLAS;
 
-  const { data, error } = await supabase
-    .from("villas")
-    .select("*")
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+  const [legacy, properties] = await Promise.all([
+    supabase
+      .from("villas")
+      .select("*")
+      .eq("status", "published")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("properties")
+      .select("*, property_photos(url, is_cover)")
+      .eq("status", "PUBLISHED")
+      .order("created_at", { ascending: false }),
+  ]);
 
-  if (error || !data || data.length === 0) return SEED_VILLAS;
-  return data.map((row, i) => mapRow(row, i));
+  const real = (properties.data ?? []).map((row, i) => mapProperty(row, i));
+  const seeded =
+    !legacy.error && legacy.data?.length
+      ? legacy.data.map((row, i) => mapRow(row, i))
+      : SEED_VILLAS;
+  return [...real, ...seeded];
 }
 
 /**

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${playfair.variable} ${manrope.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-ink-deep">{children}</body>
+      <body className="min-h-full flex flex-col bg-ink-deep">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

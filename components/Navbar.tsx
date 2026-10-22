@@ -1,11 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import UserMenu from "./UserMenu";
 import { HomeIcon, HeartIcon } from "./icons";
 
 export default function Navbar() {
+  const [favCount, setFavCount] = useState(0);
+  useEffect(() => {
+    fetch("/api/favorites")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setFavCount(d?.ids?.length ?? 0))
+      .catch(() => {});
+  }, []);
   return (
     <motion.header
       initial={{ y: -64, opacity: 0 }}
@@ -28,11 +36,16 @@ export default function Navbar() {
             <HomeIcon className="h-5 w-5" />
           </Link>
           <Link
-            href="/search?favorites=1"
+            href="/profile?tab=favorites"
             aria-label="Liked properties"
-            className="transition-colors hover:text-gold-bright"
+            className="relative transition-colors hover:text-gold-bright"
           >
             <HeartIcon className="h-5 w-5" />
+            {favCount > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[9px] font-bold text-white">
+                {favCount}
+              </span>
+            )}
           </Link>
           <UserMenu />
         </div>

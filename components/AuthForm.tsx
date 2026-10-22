@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import {
   createSupabaseBrowserClient,
@@ -9,8 +10,12 @@ import {
 
 export default function AuthForm() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
+  const [rolePick, setRolePick] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const router = useRouter();
+  const params = useSearchParams();
+  const next = params.get("next");
 
   if (!isSupabaseConfigured) {
     return (
@@ -26,6 +31,54 @@ export default function AuthForm() {
     );
   }
 
+  // After sign-up: let the new user pick their role and enter onboarding.
+  if (rolePick) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass mt-10 rounded-3xl p-8"
+      >
+        <p className="text-center text-[11px] uppercase tracking-[0.4em] text-gold">
+          One last thing
+        </p>
+        <p className="mt-2 text-center text-sm text-mist">
+          How will you use Feelit?
+        </p>
+        <div className="mt-6 grid gap-3">
+          <button
+            onClick={() => router.push("/onboarding/guest")}
+            className="glass rounded-2xl p-5 text-left transition-all hover:border-gold hover:shadow-[0_0_24px_-6px_rgba(168,85,247,0.7)]"
+          >
+            <span className="block text-sm font-semibold uppercase tracking-[0.2em] text-white">
+              I want to rent a property
+            </span>
+            <span className="mt-1 block text-xs text-mist">
+              Book extraordinary stays as a guest
+            </span>
+          </button>
+          <button
+            onClick={() => router.push("/onboarding/host")}
+            className="glass rounded-2xl p-5 text-left transition-all hover:border-gold hover:shadow-[0_0_24px_-6px_rgba(168,85,247,0.7)]"
+          >
+            <span className="block text-sm font-semibold uppercase tracking-[0.2em] text-white">
+              I want to list my property
+            </span>
+            <span className="mt-1 block text-xs text-mist">
+              Rent out your place as a host
+            </span>
+          </button>
+        </div>
+        <button
+          onClick={() => router.push("/search")}
+          className="mt-4 w-full text-center text-xs text-mist hover:text-gold-bright"
+        >
+          Skip for now →
+        </button>
+      </motion.div>
+    );
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const supabase = createSupabaseBrowserClient();
@@ -38,19 +91,28 @@ export default function AuthForm() {
     const email = String(form.get("email") ?? "");
     const password = String(form.get("password") ?? "");
 
+    if (mode === "sign-up" && password.length < 10) {
+      setBusy(false);
+      setMessage("Password needs at least 10 characters.");
+      return;
+    }
+
     const { error } =
       mode === "sign-in"
         ? await supabase.auth.signInWithPassword({ email, password })
         : await supabase.auth.signUp({ email, password });
 
     setBusy(false);
-    setMessage(
-      error
-        ? error.message
-        : mode === "sign-in"
-          ? "Signed in. Welcome back to Feelit."
-          : "Check your inbox to confirm your account.",
-    );
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    if (mode === "sign-in") {
+      router.push(next ?? "/search");
+      router.refresh();
+    } else {
+      setRolePick(true);
+    }
   }
 
   return (
@@ -96,7 +158,7 @@ export default function AuthForm() {
           name="password"
           type="password"
           required
-          minLength={6}
+          minLength={mode === "sign-up" ? 10 : 6}
           placeholder="••••••••"
           className="glass rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-gold/60"
         />

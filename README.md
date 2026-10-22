@@ -1,46 +1,43 @@
 # Feelit
 
-Ultra-luxurious 3D villa & experience rental platform.
+Ultra-luxury villa & experience rentals — Next.js App Router + TypeScript + Tailwind, Supabase (auth, Postgres, storage), Stripe (cards + bookings).
 
-**Stack:** Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Framer Motion · Three.js (React Three Fiber + drei) · Supabase · Stripe
+## Local setup
 
-## Features
-
-- **Brand** — dark slate `#0F172A` theme, gold/amber accents, glassmorphism (`globals.css` utilities: `.glass`, `.glass-strong`, `.gold-text`, `.aurora`, `.hairline`).
-- **Dual-journey hero** — guest exploration vs. owner listing paths.
-- **Interactive villa feed** — live search, sort (price/rating), Framer Motion 3D tilt + `layoutId` card expansion rendering a procedural Three.js villa preview (`estate` / `overwater` / `chalet` models).
-- **Villa detail pages** — `/villas/[id]` with a large 3D preview, amenities, stats, related villas, and a booking card.
-- **Booking flow** — dates + guests → Stripe Checkout for a 20% deposit → webhook writes a `bookings` row → `/villas/[id]/booked` confirmation.
-- **Host onboarding** — `/host` property form → Stripe Checkout ($49 one-time listing fee) → webhook publishes the villa.
-- **Curated experiences** — homepage section with concierge-arranged add-ons.
-- **Auth + dashboard** — Supabase email sign-in/up at `/auth`, auth-aware navbar, `/dashboard` lists the member's listings and stays.
-- **Graceful degradation** — no env vars required: the feed falls back to a curated seed collection, auth/dashboard/checkout show clear "not configured" states.
-
-## Setup
-
-1. `npm install`
-2. Copy `.env.example` to `.env.local` and fill in:
-   - `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Supabase → Project Settings → API)
-   - `SUPABASE_SERVICE_ROLE_KEY` (server-only; used by the Stripe webhook)
-   - `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
-3. Run `supabase/schema.sql` in the Supabase SQL editor to create `villas` + `bookings` tables with RLS policies, then optionally `supabase/seed.sql` to load the six showcase villas.
-4. `npm run dev` → http://localhost:3000
-
-## Stripe flows
-
-- `POST /api/checkout` — $49 host listing fee; villa fields ride in `metadata` → webhook inserts into `villas`.
-- `POST /api/booking` — computes nights × price × 20% deposit; booking details in `metadata` → webhook inserts into `bookings`.
-- `POST /api/stripe/webhook` — signature-verified `checkout.session.completed` handler (branches on `metadata.type`).
-- Point a Stripe webhook at `https://<host>/api/stripe/webhook` (locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`).
-
-## Structure
-
+```bash
+npm install
+cp .env.example .env.local   # fill in your keys
+npm run dev                  # http://localhost:3000
 ```
-app/                     # /, /villas/[id](+/booked), /host(+success), /auth, /dashboard, /api/*
-components/              # Navbar, UserMenu, Hero, VillaFeed, VillaCanvas (3 model variants),
-                         # VillaDetail, BookingCard, HostOnboarding, AuthForm, Experiences, SessionIdChip
-lib/                     # types, format, seed data + getVillas()/getVillaById(), stripe client
-lib/supabase/            # browser / cookie-aware server / service-role clients
-proxy.ts                 # Supabase auth session refresh (Next 16 convention)
-supabase/schema.sql      # villas + bookings tables, RLS
-```
+
+Required env vars (see `.env.example`):
+
+- `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase project API
+- `SUPABASE_SERVICE_ROLE_KEY` — server-side writes (uploads, GDPR export, deletes)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_SECRET_KEY` — Stripe test keys
+- `FIELD_ENCRYPTION_KEY` — 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM of sensitive fields
+- `NEXT_PUBLIC_SITE_URL` — `http://localhost:3000` locally
+
+## Database
+
+Apply `supabase/schema.sql` then `supabase/seed.sql` in the Supabase SQL Editor (Dashboard → SQL → New query → paste → Run). Seed creates:
+
+- `guest@feelit.demo` / `host@feelit.demo` — password `Feelit-Demo-1`
+- 5 published villas with cover photos
+
+## What's inside
+
+- **Two roles**: GUEST + HOST (one account can be both).
+- **Sign-up → role choice** → multi-step autosaved onboarding wizard (`/onboarding/guest`, `/onboarding/host`). Drafts persist in the DB — close the tab and resume.
+- **Guest profile** (`/profile`): overview, personal data inline-edit, identity documents (masked, password-gated reveal), payment methods via Stripe, bookings (cancel/modify), favorites, photo uploads, villa media, messages, reviews, GDPR export + account delete.
+- **Host dashboard** (`/host`): stats, listing wizard (draft → review → publish, pause/delete), per-property calendar (block dates + custom prices), reservations accept/decline, earnings + CSV export, 3D/drone/walk media management, messages, settings.
+- **Booking**: real availability calendar, price rules, transactional `book_property` RPC (row lock → no double booking), cancellation-policy refunds.
+- **Security**: AES-256-GCM encryption at rest for JMBG/ID/IBAN/tax IDs, masked display + reveal endpoint, private storage bucket with signed URLs, RLS on every table, audit log.
+- **Media**: per-property GLB 3D model, drone video and walk-through with NOT_GENERATED / PROCESSING / READY statuses and auto-refresh.
+- The search feed (`/search`) keeps the expanding 3D-card animation; published host listings appear there automatically.
+
+## Conventions
+
+- Dark-only theme: `ink` backgrounds, `gold` (violet) accent — see `app/globals.css` `@theme` tokens.
+- Shared UI kit in `components/ui.tsx` (Button, Field, Card, Modal, Tabs, Stepper, Toast, Badge, Skeleton…).
+- All data access goes through `app/api/*` route handlers using `lib/api.ts` helpers (auth, rate limit, audit).

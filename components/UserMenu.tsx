@@ -44,10 +44,16 @@ export default function UserMenu() {
   return (
     <div className="flex items-center gap-3">
       <Link
-        href="/dashboard"
+        href="/profile"
         className="hidden text-mist transition-colors hover:text-gold-bright sm:inline"
       >
-        Dashboard
+        Profile
+      </Link>
+      <Link
+        href="/host"
+        className="hidden text-mist transition-colors hover:text-gold-bright sm:inline"
+      >
+        Host
       </Link>
       <button
         onClick={async () => {
