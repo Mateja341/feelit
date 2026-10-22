@@ -246,43 +246,42 @@ function ListingCard({
       <AnimatePresence>
         {expanded && (
           <>
-            {/* rear face */}
+            {/* rear face — slides out down-right after the card grows */}
             <motion.div
               key="rear"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, x: 0, y: 0 }}
+              animate={{ opacity: 1, x: 30, y: 30 }}
+              exit={{ opacity: 0, x: 0, y: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 26, delay: 0.1 }}
               aria-hidden
-              className="absolute inset-0 rounded-3xl border border-gold/15 bg-[#0a0c1e]"
-              style={{ transform: "translate(30px, -30px)" }}
+              className="absolute inset-0 rounded-3xl border border-gold/25 bg-gradient-to-br from-[#1b1238] via-[#12142e] to-[#0a0c1e] shadow-[0_30px_80px_-20px_rgba(110,58,255,0.45)]"
             />
-            {/* top face — parallelogram above the front edge */}
+            {/* bottom face — parallelogram below the front edge */}
             <motion.div
-              key="topface"
-              initial={{ scaleY: 0, skewX: -45 }}
-              animate={{ scaleY: 1, skewX: -45 }}
-              exit={{ scaleY: 0, skewX: -45 }}
-              transition={{ type: "spring", stiffness: 200, damping: 26 }}
+              key="bottomface"
+              initial={{ scaleY: 0, skewX: 45 }}
+              animate={{ scaleY: 1, skewX: 45 }}
+              exit={{ scaleY: 0, skewX: 45 }}
+              transition={{ type: "spring", stiffness: 200, damping: 26, delay: 0.1 }}
               aria-hidden
-              className="absolute inset-x-0 bottom-full h-[30px] border border-gold/35"
+              className="absolute inset-x-0 top-full h-[30px] border-x border-b border-gold/30"
               style={{
-                transformOrigin: "0% 100%",
-                background:
-                  "linear-gradient(90deg, rgba(45,21,82,0.9), rgba(30,18,66,0.85))",
+                transformOrigin: "0% 0%",
+                background: "linear-gradient(90deg, #141632, #0a0c1e)",
               }}
             />
             {/* right face — parallelogram right of the front edge */}
             <motion.div
               key="rightface"
-              initial={{ scaleX: 0, skewY: -45 }}
-              animate={{ scaleX: 1, skewY: -45 }}
-              exit={{ scaleX: 0, skewY: -45 }}
-              transition={{ type: "spring", stiffness: 200, damping: 26 }}
+              initial={{ scaleX: 0, skewY: 45 }}
+              animate={{ scaleX: 1, skewY: 45 }}
+              exit={{ scaleX: 0, skewY: 45 }}
+              transition={{ type: "spring", stiffness: 200, damping: 26, delay: 0.1 }}
               aria-hidden
               className="absolute inset-y-0 left-full w-[30px] border-y border-r border-gold/25"
               style={{
                 transformOrigin: "0% 0%",
-                background: "linear-gradient(180deg, #141632, #0a0c1e)",
+                background: "linear-gradient(180deg, #1b1238, #0a0c1e)",
               }}
             />
           </>
@@ -721,6 +720,7 @@ export default function SearchFeed({ villas }: { villas: Villa[] }) {
         {filtered.map((v, i) => (
           <motion.div
             key={v.id}
+            layout
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.06 }}
